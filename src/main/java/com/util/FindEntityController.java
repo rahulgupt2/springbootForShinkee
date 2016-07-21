@@ -1,5 +1,7 @@
 package com.util;
 
+import io.undertow.attribute.RequestMethodAttribute;
+
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -83,8 +85,6 @@ public class FindEntityController {
 		userFive.setUserAddress("ghorpadi");
 		userFive.setUserName("varun");
 		save(userFive);
-		
-		
 	
 	}
 	
@@ -97,20 +97,70 @@ public class FindEntityController {
 	
 	
 	@CrossOrigin
-	@RequestMapping(value = "/getuser",
+	@RequestMapping(value = "/users",
 					method = RequestMethod.GET,
 					produces = MediaType.APPLICATION_JSON_VALUE)	
 	public ResponseEntity<Collection<User>> getUsers() {
 				
-		Collection<User> users =  userMap.values();
-		
+		Collection<User> users =  userMap.values();		
 		return new ResponseEntity<Collection<User>>(users, HttpStatus.OK);
 				
+	}
+	/*
+	@RequestMapping(value = "/postuser", 
+			method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_VALUE)	
+	public ResponseEntity<> postUsers(User user) {	
+				
+	}		
+	*/
+	
+	
+	@CrossOrigin
+	@RequestMapping(value = "/user", method = RequestMethod.GET ,
+	produces = MediaType.APPLICATION_JSON_VALUE)
+
+	public ResponseEntity<User> getUser(@RequestParam("id") BigInteger id) {
+		
+		
+		
+		User user = null;
+		for(BigInteger key : userMap.keySet()) {
+					System.out.println(key);
+		// for big integer comparision we use equals method
+			if(key.equals(id)) {
+				user = userMap.get(key);
+				System.out.println(user);
+			}	
+		}		
+		if(user == null) {
+			return new ResponseEntity<User>(user,HttpStatus.NOT_FOUND);
+		}	
+		return new ResponseEntity<User>(user,HttpStatus.OK);
 	}
 	
 	
 	
 	
+	@CrossOrigin
+	@RequestMapping(value = "/user", method = RequestMethod.POST ,
+	consumes = MediaType.APPLICATION_JSON_VALUE,
+	produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<User> PostUser(@RequestBody User user) {
+		
+		
+		if(user == null) {
+			return new ResponseEntity<User>(user, HttpStatus.BAD_REQUEST);
+		}		
+		User userCreated = save(user);
+		if(userCreated == null) {
+			return new ResponseEntity<User>(user, HttpStatus.BAD_REQUEST);
+		}				
+		return new ResponseEntity<User>(userCreated, HttpStatus.CREATED);
+		
+	
+	
+	}
 	
 }	
 	
